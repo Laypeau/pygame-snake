@@ -2,4 +2,4 @@
 
 Snake.
 
-Survey here: forms.gle/SmxbjWwzjnhZMs859
+Survey here: https://forms.gle/SmxbjWwzjnhZMs859
