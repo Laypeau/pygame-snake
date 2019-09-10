@@ -76,34 +76,26 @@ while True:
         elif e.type == KEYDOWN:
             if e.key == K_UP and direction != "south":
                 direction = "north"
-                print("keydown north")
                 break
             elif e.key == K_DOWN and direction != "north":
                 direction = "south"
-                print("keydown south")
                 break
             elif e.key == K_LEFT and direction != "east":
                 direction = "west"
-                print("keydown west")
                 break
             elif e.key == K_RIGHT and direction != "west":
                 direction = "east"
-                print("keydown east")
                 break
-
-    print("Final keydown: " + direction)
     
     #Checks a collision with self
     i = len(segment_x)-1
     while i >= 2:
         if collide(segment_x[0], segment_x[i], segment_y[0], segment_y[i], 20, 20, 20, 20):
-            print("death: collision with self")
             die(screen, score)
         i-= 1
 
     #Checks and handles a collision with the apple
     if collide(segment_x[0], applepos[0], segment_y[0], applepos[1], 20, 10, 20, 10):
-        print("event: apple collected")
         score+=1;
         segment_x.append(700) #Appends a segment off-screen, which is teleported to the end of the snake when it moves, before the frame is rendered.
         segment_y.append(700) #I can't add more than one segment per frame without some effort
@@ -111,11 +103,9 @@ while True:
         for i in range(0, len(segment_x)):
             while applepos[0] == segment_x[i] and applepos[1] == segment_y[i]:
                 applepos = ((random.choice(appleseq_x),  random.choice(appleseq_y)))
-                print("Event: apple relocation to " +  str(applepos))
 
     #If outside of play area      
     if segment_x[0] < 30 or segment_x[0] >= 350 or segment_y[0] < 70 or segment_y[0] >= 390:      
-        print("death: out of bounds at ", str(segment_x[0]) + ", " + str(segment_y[0]) )
         die(screen, score)
     
     #This part moves the snake. It was in a while loop for some reason before, which was bad
