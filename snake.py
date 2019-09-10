@@ -4,7 +4,8 @@
 
 import pygame, random, sys
 from pygame.locals import *
-highscore = open("hiscore.txt").read()
+highscore = open("highscore.txt").read()
+
             #DEFINING FUNCTIONS
 #Defines the collision function
 def collide(x1, x2, y1, y2, w1, w2, h1, h2):
@@ -16,8 +17,14 @@ def collide(x1, x2, y1, y2, w1, w2, h1, h2):
 #Define the death function
 def die(screen, score):
     font = pygame.font.SysFont("Arial", 20, (255,255,255)); #Defines font again, but bigger
-    text = font.render("Your score was: " + str(score), True, (255, 255, 255)); #Creates death text. font.render(string, antialiasing, colour)
-    screen.blit(text, (10, 270)); #Actually draws the text
+    gameend_text = font.render("Your score was: " + str(score), True, (255, 255, 255)) #Creates death text. font.render(string, antialiasing, colour)
+    highscore_text = font.render("You beat the highscore of " + str(highscore) +"!", True, (255, 255, 255));
+    screen.blit(gameend_text, (10, 270)); #Actually draws the text
+    if score > int(highscore):
+        name = open("highscore.txt", "w")
+        name.write(str(score))
+        name.close()
+        screen.blit(highscore_text, (10, 290))
     pygame.display.update(); #Updates the display with the text on it (So the text appears)
     pygame.time.wait(2500); #Waits 25 seconds
     sys.exit(0) #Exit game
@@ -30,6 +37,7 @@ segment_y = [230, 230, 230, 230, 230]
 
 direction = "east" #Direction variable for the snake head
 score = 0 #Increments by one each time an apple is eaten
+highscore = open("highscore.txt").read()
 
 appleseq_x = [30, 50, 70, 90, 110, 130, 150, 170, 190, 210, 230, 250, 270, 290, 310, 330] #Because random.randint() is dumb
 appleseq_y = [70, 90, 110, 130, 150, 170, 190, 210, 230, 250, 270, 290, 310, 330, 350, 370]
@@ -97,7 +105,13 @@ while True:
         score+=1;
         segment_x.append(700) #Appends a segment off-screen, which is teleported to the end of the snake when it moves, before the frame is rendered.
         segment_y.append(700) #I can't add more than one segment per frame without some effort
-        applepos = ((random.choice(appleseq_x), random.choice(appleseq_y))) # make sure it doesn't land on the snake
+        applepos = ((random.choice(appleseq_x),  random.choice(appleseq_y)))
+        while applepos[0] in segment_x:
+            applepos = ((random.choice(appleseq_x), applepos[1]))
+            print("apple x changed")
+        while applepos[1] in segment_y:
+            print("apple y changed")
+            applepos = (applepos[0],  random.choice(appleseq_y)) 
         print("Event: apple relocation to " +  str(applepos))
 
     #If outside of play area      
@@ -106,13 +120,11 @@ while True:
         print("death: out of bounds at ", str(segment_x[0]) + ", " + str(segment_y[0]) )
         die(screen, score)
     
-    #This part moves the snake
+    #This part moves the snake. It was in a while loop for some reason before, which was bad
     #For each segment of the snake that isn't the first, set it's position to the one before it in the list
-    i = len(segment_x)-1
-    while i >= 1:
+    for i in range(len(segment_x)-1, 0, -1):
         segment_x[i] = segment_x[i-1]
         segment_y[i] = segment_y[i-1]
-        i -= 1
         
     #For the snake head, move it 20 units in the direction of movement
     if direction=="south":
@@ -138,8 +150,9 @@ while True:
     #Draws the score text
     scoretext = font.render(str(score), True, (255, 255, 255))
     screen.blit(scoretext, (10, 5))
-    highscoretext = font.render(str(score), True, (255, 255, 255))
-    screen.blit("Score: " + highscoretext, (10, 5))
+    
+    highscoretext = font.render(str(highscore), True, (255, 255, 255))
+    screen.blit(highscoretext, (100, 5))
     
     #Time to update the display
     pygame.display.update()
