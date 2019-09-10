@@ -1,5 +1,5 @@
 # Amazing snake game
-# Adapted from project by Samuel Backman by Nathan Duong
+# Adapted from "Snake in 35 Lines 1.0" by Samuel Backman by Nathan Duong
 # Original can be found at https://www.pygame.org/project/818/1409
 
 import pygame, random, sys
@@ -16,15 +16,17 @@ def collide(x1, x2, y1, y2, w1, w2, h1, h2):
 
 #Define the death function
 def die(screen, score):
-    font = pygame.font.SysFont("Arial", 20, (255,255,255)); #Defines font again, but bigger
+    font = pygame.font.SysFont("Arial", 20, (255,255,255)) #Defines font again, but bigger
+    dead_text = font.render("You died!", True, (255, 255, 255)) #Creates death text. font.render(string, antialiasing, colour)
     gameend_text = font.render("Your score was: " + str(score), True, (255, 255, 255)) #Creates death text. font.render(string, antialiasing, colour)
     highscore_text = font.render("You beat the highscore of " + str(highscore) +"!", True, (255, 255, 255));
-    screen.blit(gameend_text, (10, 270)); #Actually draws the text
+    screen.blit(dead_text, (40, 160)) #Actually draws the text
+    screen.blit(gameend_text, (40, 180))
     if score > int(highscore):
         name = open("highscore.txt", "w")
         name.write(str(score))
         name.close()
-        screen.blit(highscore_text, (10, 290))
+        screen.blit(highscore_text, (40, 200))
     pygame.display.update(); #Updates the display with the text on it (So the text appears)
     pygame.time.wait(2500); #Waits 25 seconds
     sys.exit(0) #Exit game
@@ -32,8 +34,8 @@ def die(screen, score):
             #SETTING VARIABLES
 #Sets the positions for the first five segments in the snake
 #Each segment of the snake has it's x and y co-ordinates stored in these two lists
-segment_x = [50, 30, 30, 30, 30] 
-segment_y = [230, 230, 230, 230, 230]
+segment_x = [50, 30, 30] 
+segment_y = [230, 230, 230]
 
 direction = "east" #Direction variable for the snake head
 score = 0 #Increments by one each time an apple is eaten
@@ -47,23 +49,23 @@ applepos = ((random.choice(appleseq_x), random.choice(appleseq_y))) #Sets apple 
 pygame.init(); #initialises pygame wow
 screen = pygame.display.set_mode((380, 420)); #Window resolution
 pygame.display.set_caption("Snake"); #Window title
-font = pygame.font.SysFont("Arial", 25, True); #Sets f to a font to display the score
+font = pygame.font.SysFont("Arial", 22, True); #Sets f to a font to display the score
 clock = pygame.time.Clock() #Creates a clock
 
 #define the apple as a pygame surface
 appleimage = pygame.Surface((20, 20)); #pygame.Surface() creates a sprite, taking in dimension parameters to draw a blank one
-appleimage.fill((0, 255, 0)); #Fills the surface with a flat colour
+appleimage.fill((255, 1, 1)); #Fills the surface with a flat colour
 
 #Define a snake segment as a pygame surface
 img = pygame.Surface((20,20));
-img.fill((255, 0, 0));
+img.fill((255,230,00));
 
 #Define the background image as a surface
 bgimage = pygame.image.load("aaa.png").convert()
 
             #MAIN LOOP
 while True:
-    clock.tick(10)
+    clock.tick(7)
 
     #Checks the event stack
     for e in pygame.event.get():
@@ -106,17 +108,13 @@ while True:
         segment_x.append(700) #Appends a segment off-screen, which is teleported to the end of the snake when it moves, before the frame is rendered.
         segment_y.append(700) #I can't add more than one segment per frame without some effort
         applepos = ((random.choice(appleseq_x),  random.choice(appleseq_y)))
-        while applepos[0] in segment_x:
-            applepos = ((random.choice(appleseq_x), applepos[1]))
-            print("apple x changed")
-        while applepos[1] in segment_y:
-            print("apple y changed")
-            applepos = (applepos[0],  random.choice(appleseq_y)) 
-        print("Event: apple relocation to " +  str(applepos))
+        for i in range(0, len(segment_x)):
+            while applepos[0] == segment_x[i] and applepos[1] == segment_y[i]:
+                applepos = ((random.choice(appleseq_x),  random.choice(appleseq_y)))
+                print("Event: apple relocation to " +  str(applepos))
 
     #If outside of play area      
-    if segment_x[0] < 30 or segment_x[0] >= 350 or segment_y[0] < 70 or segment_y[0] >= 390:
-        
+    if segment_x[0] < 30 or segment_x[0] >= 350 or segment_y[0] < 70 or segment_y[0] >= 390:      
         print("death: out of bounds at ", str(segment_x[0]) + ", " + str(segment_y[0]) )
         die(screen, score)
     
@@ -139,20 +137,20 @@ while True:
     #RENDER TIME
     #Creates the background
     screen.blit(bgimage,(0,0))
+
+    #Draws the apple
+    screen.blit(appleimage, applepos)
     
     #Draws the snake
     for i in range(0, len(segment_x)):
         screen.blit(img, (segment_x[i], segment_y[i]))
 
-    #Draws the apple
-    screen.blit(appleimage, applepos)
-        
     #Draws the score text
-    scoretext = font.render(str(score), True, (255, 255, 255))
-    screen.blit(scoretext, (10, 5))
+    scoretext = font.render("Score: " + str(score), True, (255, 255, 255))
+    screen.blit(scoretext, (40, 8))
     
-    highscoretext = font.render(str(highscore), True, (255, 255, 255))
-    screen.blit(highscoretext, (100, 5))
+    highscoretext = font.render("Highscore: " + str(highscore), True, (255, 255, 255))
+    screen.blit(highscoretext, (190, 8))
     
     #Time to update the display
     pygame.display.update()
