@@ -4,8 +4,6 @@
 
 import pygame, random, sys
 from pygame.locals import *
-highscore = open("highscore.txt").read()
-
             #DEFINING FUNCTIONS
 #Defines the collision function
 def collide(x1, x2, y1, y2, w1, w2, h1, h2):
@@ -88,11 +86,9 @@ while True:
                 break
     
     #Checks a collision with self
-    i = len(segment_x)-1
-    while i >= 2:
+    for i in (len(segment_x)-1, 2, -1):
         if collide(segment_x[0], segment_x[i], segment_y[0], segment_y[i], 20, 20, 20, 20):
             die(screen, score)
-        i-= 1
 
     #Checks and handles a collision with the apple
     if collide(segment_x[0], applepos[0], segment_y[0], applepos[1], 20, 10, 20, 10):
@@ -124,7 +120,7 @@ while True:
     elif direction=="west":
         segment_x[0] -= 20
 
-    #RENDER TIME
+        #RENDER TIME
     #Creates the background
     screen.blit(bgimage,(0,0))
 
